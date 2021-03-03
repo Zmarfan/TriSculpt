@@ -1,14 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class ImageProperties : MonoBehaviour
 {
-    public static Texture2D GetEntropyImage(Texture2D texture, int sampleArea)
+    public static Texture2D GetEntropyImage(Texture2D texture, int sampleArea, out float[,] returnEntropyTable)
     {
         Texture2D entropyTexture = new Texture2D(texture.width, texture.height);
         Color[] oldColors = texture.GetPixels();
         Color[] newColors = new Color[oldColors.Length];
+        float[,] entropyTable = new float[texture.width, texture.height];
 
         Histogram histogram = new Histogram();
 
@@ -25,6 +27,7 @@ public class ImageProperties : MonoBehaviour
                     continue;
                 for (int y = -sampleArea; y <= sampleArea; y++)
                 {
+                    //This pixel is out of bounds
                     if (IsPixelOutOfBounds(thisY + y, texture.height))
                         continue;
 
@@ -35,7 +38,7 @@ public class ImageProperties : MonoBehaviour
             float entropy = histogram.EntropyOfHistogram();
 
             newColors[i] = new Color(entropy / 5f, entropy / 5f, entropy / 5f);
-
+            entropyTable[thisX, thisY] = entropy;
 
             histogram.Clear();
         }
@@ -44,6 +47,7 @@ public class ImageProperties : MonoBehaviour
         entropyTexture.SetPixels(newColors);
         entropyTexture.Apply();
 
+        returnEntropyTable = entropyTable;
         return entropyTexture;
     }
 
@@ -52,7 +56,7 @@ public class ImageProperties : MonoBehaviour
     /// </summary>
     /// <param name="position">pixel position in x/y</param>
     /// <param name="maxDimension">width/height</param>
-    static bool IsPixelOutOfBounds(int position, int maxDimension)
+    public static bool IsPixelOutOfBounds(int position, int maxDimension)
     {
         return position < 0 || position >= maxDimension;
     }

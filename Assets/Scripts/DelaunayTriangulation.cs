@@ -6,10 +6,8 @@ using UnityEngine;
 
 public class DelaunayTriangulationGenerator : MonoBehaviour
 {
-    public static List<Triangle> GenerateDelaunayTriangulatedGraph(int pointAmount, Vector2 bounds)
+    public static List<Triangle> GenerateDelaunayTriangulationWithPoints(List<Vector2> points, Vector2 bounds)
     {
-        List<Vector2> points = GeneratePoints(pointAmount, bounds);
-
         Triangle superTriangle = GenerateSuperTriangle(bounds);
         List<Triangle> triangulation = BowyerWatson(new List<Triangle> { superTriangle }, points, bounds);
 
@@ -22,6 +20,13 @@ public class DelaunayTriangulationGenerator : MonoBehaviour
         }
 
         return triangulation;
+    }
+
+    public static List<Triangle> GenerateRandomDelaunayTriangulatedGraph(int pointAmount, Vector2 bounds)
+    {
+        List<Vector2> points = GeneratePoints(pointAmount, bounds);
+
+        return GenerateDelaunayTriangulationWithPoints(points, bounds);
     }
 
     public static List<Vector2> GeneratePoints(int pointAmount, Vector2 bounds)

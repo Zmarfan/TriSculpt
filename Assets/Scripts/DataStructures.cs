@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+[System.Serializable]
 public class Triangle
 {
     public Vector2[] vertices;

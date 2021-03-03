@@ -332,11 +332,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _seed: 0
-  _pointAmount: 25
+  _pointAmount: 100
   _bounds: {x: 2, y: 2}
-  _texture: {fileID: 2800000, guid: 9c72ff15faf1b374d9d46648221325ab, type: 3}
-  _colorDepth: 8
+  _texture: {fileID: 2800000, guid: 595ff571ce6477a40b107b64d18952d0, type: 3}
+  _colorDepth: 5
   _sampleArea: 2
+  _influenceLength: 15
+  _influenceStrength: 2
+  _displayTextureState: 1
   _useBlackWhite: 1
   _useColorDepth: 1
   _useEntropy: 1
@@ -402,8 +405,8 @@ MonoBehaviour:
   _use: 1
   _displayAll: 1
   _index: 0
-  _circleCenterRadius1: 0.01
-  _circleCenterRadius2: 0.005
+  _circleCenterRadius1: 1
+  _circleCenterRadius2: 0.5
   _circleColors: {r: 1, g: 0, b: 0, a: 1}
   _triangleColors: {r: 0, g: 0, b: 0, a: 1}
   _superTriangleColors: {r: 0.8469629, g: 1, b: 0, a: 1}
