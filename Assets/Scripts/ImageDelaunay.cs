@@ -56,13 +56,13 @@ public class ImageDelaunay
         for (int x = -influenceLength; x <= influenceLength; x++)
         {
             //This index is out of bounds
-            if (ImageProperties.IsPixelOutOfBounds(thisX + x, width))
+            if (thisX + x < 0 || thisX + x >= width)
                 continue;
 
             for (int y = -influenceLength; y <= influenceLength; y++)
             {
                 //This index is out of bounds
-                if (ImageProperties.IsPixelOutOfBounds(thisX + x, height))
+                if (thisY + y < 0 || thisY + y >= height)
                     continue;
 
                 float old = entropyTable[thisX + x, thisY + y];

@@ -201,7 +201,7 @@ Transform:
   m_GameObject: {fileID: 147553251}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 100.5, y: 100.5, z: 100.5}
   m_Children: []
   m_Father: {fileID: 603717449}
   m_RootOrder: 1
@@ -402,17 +402,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37cc925a607d05f448d1d1fbec1dfc37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _use: 1
+  _use: 0
   _displayAll: 1
   _index: 0
   _circleCenterRadius1: 1
   _circleCenterRadius2: 0.5
   _circleColors: {r: 1, g: 0, b: 0, a: 1}
-  _triangleColors: {r: 0, g: 0, b: 0, a: 1}
+  _triangleColors: {r: 1, g: 0, b: 0.67266417, a: 1}
   _superTriangleColors: {r: 0.8469629, g: 1, b: 0, a: 1}
-  _circleCenterColor1: {r: 0, g: 0, b: 0, a: 1}
+  _circleCenterColor1: {r: 1, g: 1, b: 1, a: 1}
   _circleCenterColor2: {r: 1, g: 1, b: 1, a: 1}
   _showCircles: 0
   _showTriangles: 1
-  _showSuperTriangles: 0
+  _showSuperTriangles: 1
   _showCircleCenters: 0

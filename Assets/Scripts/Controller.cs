@@ -53,14 +53,24 @@ public class Controller : MonoBehaviour
         if (_useEntropy)
             texture = ImageProperties.GetEntropyImage(texture, _sampleArea, out entropyTable);
 
-        //Points in texture coordinates
-        List<Vector2> imageDetailPoints = ImageDelaunay.GenerateImageDetailPointsFromEntropy(entropyTable, _pointAmount, _influenceLength, _influenceStrength);
 
-        Vector2 textureBounds = new Vector2(texture.width * 2 + 1, texture.height * 2 + 1);
-        triangulation = DelaunayTriangulationGenerator.GenerateDelaunayTriangulationWithPoints(imageDetailPoints, textureBounds);
-        _displayDelaunayTriangulation.Display(triangulation, textureBounds);
+        if (entropyTable.GetLength(0) != 0)
+        {
+            //Points in texture coordinates
+            List<Vector2> imageDetailPoints = ImageDelaunay.GenerateImageDetailPointsFromEntropy(entropyTable, _pointAmount, _influenceLength, _influenceStrength);
 
-        _displayTexture.transform.position = new Vector3(textureBounds.x / 2, textureBounds.y / 2);
+            foreach (Vector2 point in imageDetailPoints)
+                texture.SetPixel((int)point.x - texture.width / 2, (int)point.y - texture.height / 2, Color.blue);
+
+            texture.Apply();
+
+            Vector2 textureBounds = new Vector2(texture.width * 2 + 1, texture.height * 2 + 1);
+            triangulation = DelaunayTriangulationGenerator.GenerateDelaunayTriangulationWithPoints(imageDetailPoints, textureBounds);
+            _displayDelaunayTriangulation.Display(triangulation, textureBounds);
+
+            _displayTexture.transform.position = new Vector3(textureBounds.x / 2, textureBounds.y / 2);
+        } 
+        
         if (_displayTextureState)
             _displayTexture.Display(texture);
 
