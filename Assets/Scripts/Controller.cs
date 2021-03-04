@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Controller : MonoBehaviour
 {
+    public static readonly float OFFSET_EPSILON = 0.001f;
+
     [Header("Main Settings")]
 
     [SerializeField] int _seed;
@@ -69,8 +71,8 @@ public class Controller : MonoBehaviour
             _displayDelaunayTriangulation.Display(triangulation, textureBounds);
 
             _displayTexture.transform.position = new Vector3(textureBounds.x / 2, textureBounds.y / 2);
-        } 
-        
+        }
+
         if (_displayTextureState)
             _displayTexture.Display(texture);
 

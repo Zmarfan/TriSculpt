@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 [System.Serializable]
 public class Triangle
@@ -116,12 +117,15 @@ public class Edge
 /// </summary>
 public class Histogram
 {
-    static int count = 0;
-    static int testPixel = -1;
-
     //Key => 0-1 color value, Value => amount of that pixel
     Dictionary<float, int> _histogram = new Dictionary<float, int>();
     int _totalPixels = 0;
+
+    public void Clear()
+    {
+        _histogram = new Dictionary<float, int>();
+        _totalPixels = 0;
+    }
 
     /// <summary>
     /// Add a pixel to histogram
@@ -138,18 +142,9 @@ public class Histogram
     }
 
     /// <summary>
-    /// Reset histogram
-    /// </summary>
-    public void Clear()
-    {
-        _histogram = new Dictionary<float, int>();
-        _totalPixels = 0;
-    }
-
-    /// <summary>
     /// Calculate entropy of given pixels
     /// </summary>
-    public float EntropyOfHistogram()
+    public float EntropyOfHistogram(LookupTable<float, float> lookupTable)
     {
         //Source: https://en.wiktionary.org/wiki/Shannon_entropy
 
@@ -157,12 +152,14 @@ public class Histogram
         float entropy = 0;
 
         for (int i = 0; i < amountOfEachColor.Count; i++)
-            entropy += EntropyPartCalculation(amountOfEachColor[i], _totalPixels);
-
-        if (count == testPixel)
-            Debug.Log(entropy);
-
-        count++;
+        {
+            float ratio = amountOfEachColor[i] / (float)_totalPixels;
+            entropy += lookupTable.GetTableContent(ratio, () =>
+            {
+                return ratio * (float)Math.Log(1 / ratio, 2);
+            });
+            //entropy += EntropyPartCalculation(ratio);
+        }
 
         return entropy;
     }
@@ -172,8 +169,33 @@ public class Histogram
     /// </summary>
     /// <param name="amount">amount of this pixel type</param>
     /// <param name="totalAmount">total amount of pixels</param>
-    float EntropyPartCalculation(int amount, int totalAmount)
+    float EntropyPartCalculation(float ratio)
     {
-        return (amount / (float)totalAmount) * Mathf.Log(1 / (amount / (float)totalAmount), 2);
+        return ratio * (float)Math.Log(1 / ratio, 2);
+    }
+}
+
+public class LookupTable<T, J>
+{
+    Dictionary<T, J> _lookupTable;
+
+    public LookupTable()
+    {
+        _lookupTable = new Dictionary<T, J>();
+    }
+
+    /// <summary>
+    /// Returns table value. If it's been calculated previously it won't calculate again
+    /// </summary>
+    /// <param name="key">Key to value</param>
+    /// <param name="formula">Formula to calculate value</param>
+    /// <returns>Value from Key</returns>
+    public J GetTableContent(T key, Func<J> formula)
+    {
+        //If this value is already calculated -> return it
+        if (!_lookupTable.ContainsKey(key))
+            _lookupTable.Add(key, formula());
+
+        return _lookupTable[key];
     }
 }

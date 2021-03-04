@@ -12,7 +12,13 @@ public class ImageProperties : MonoBehaviour
         Color[] newColors = new Color[oldColors.Length];
         float[,] entropyTable = new float[texture.width, texture.height];
 
+        LookupTable<float, float> lookupTable = new LookupTable<float, float>();
         Histogram histogram = new Histogram();
+
+        //TESTING
+        System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+        stopwatch.Start();
+        int testIterations = 0;
 
         for (int i = 0; i < oldColors.Length; i++)
         {
@@ -20,28 +26,29 @@ public class ImageProperties : MonoBehaviour
             int thisX = i - thisY * texture.width;
 
             //For each pixel check sample area around it to set this pixel entropy
-            for (int x = -sampleArea; x <= sampleArea; x++)
+            for (int x = Mathf.Max(thisX - sampleArea, 0); x <= thisX + sampleArea && x < texture.width; x++)
             {
-                //This pixel is out of bounds
-                if (IsPixelOutOfBounds(thisX + x, texture.width))
-                    continue;
-                for (int y = -sampleArea; y <= sampleArea; y++)
+                for (int y = Mathf.Max(thisY - sampleArea, 0); y <= thisY + sampleArea && y < texture.height; y++)
                 {
-                    //This pixel is out of bounds
-                    if (IsPixelOutOfBounds(thisY + y, texture.height))
-                        continue;
+                    histogram.AddPixel(oldColors[x + y * texture.width]);
 
-                    histogram.AddPixel(oldColors[thisX + x + (thisY + y) * texture.width]);
+                    //TESTING
+                    testIterations++;
                 }
             }
 
-            float entropy = histogram.EntropyOfHistogram();
+            float entropy = histogram.EntropyOfHistogram(lookupTable);
+            histogram.Clear();
 
             newColors[i] = new Color(entropy / 5f, entropy / 5f, entropy / 5f);
             entropyTable[thisX, thisY] = entropy;
-
-            histogram.Clear();
         }
+
+        //TESTING
+        System.TimeSpan ts = stopwatch.Elapsed;
+        stopwatch.Stop();
+        string elapsedTime = string.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+        Debug.Log(elapsedTime + ", Iterations: " + testIterations);
 
         entropyTexture.filterMode = FilterMode.Point;
         entropyTexture.SetPixels(newColors);

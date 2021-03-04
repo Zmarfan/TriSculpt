@@ -334,13 +334,13 @@ MonoBehaviour:
   _seed: 0
   _pointAmount: 100
   _bounds: {x: 2, y: 2}
-  _texture: {fileID: 2800000, guid: 595ff571ce6477a40b107b64d18952d0, type: 3}
-  _colorDepth: 5
+  _texture: {fileID: 2800000, guid: 1e89e6edce5b069489d1e2c5ae566912, type: 3}
+  _colorDepth: 8
   _sampleArea: 2
   _influenceLength: 15
   _influenceStrength: 2
   _displayTextureState: 1
-  _useBlackWhite: 1
+  _useBlackWhite: 0
   _useColorDepth: 1
   _useEntropy: 1
 --- !u!4 &603717449
@@ -402,7 +402,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37cc925a607d05f448d1d1fbec1dfc37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _use: 0
+  _use: 1
   _displayAll: 1
   _index: 0
   _circleCenterRadius1: 1

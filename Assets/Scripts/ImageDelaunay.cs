@@ -5,6 +5,13 @@ using System.Linq;
 
 public class ImageDelaunay
 {
+    /// <summary>
+    /// Gives a list of most interesting pixels (highest entropy) in an image from it's entropyTable
+    /// </summary>
+    /// <param name="entropyTable">Entropy table of a texture</param>
+    /// <param name="pointAmount">Amount of interesting points to find</param>
+    /// <param name="influenceLength">How far apart the points should be</param>
+    /// <param name="influenceStrength">How strong the influence is</param>
     public static List<Vector2> GenerateImageDetailPointsFromEntropy(float[,] entropyTable, int pointAmount, int influenceLength, float influenceStrength)
     {
         int width = entropyTable.GetLength(0);
@@ -16,6 +23,7 @@ public class ImageDelaunay
         {
             FindMaxValueIndexes(in entropyTable, out int x, out int y);
             points.Add(new Vector2Int(x + width / 2, y + height / 2));
+            //Lower the entropy of points around last max entropy pixel
             AffectNearbyEntropyLevels(x, y, influenceLength, influenceStrength, ref entropyTable);
         }
 
@@ -48,6 +56,13 @@ public class ImageDelaunay
         }
     }
 
+    /// <summary>
+    /// Lower entropy level of surrounding pixels and set current to 0
+    /// </summary>
+    /// <param name="thisX">This pixel x coord</param>
+    /// <param name="thisY">This pixel y coord</param>
+    /// <param name="influenceLength">How far around the pixel affect entropy</param>
+    /// <param name="influenceStrength">How strongly should surrounding pixels be affected</param>
     static void AffectNearbyEntropyLevels(int thisX, int thisY, int influenceLength, float influenceStrength, ref float[,] entropyTable)
     {
         int width = entropyTable.GetLength(0);
