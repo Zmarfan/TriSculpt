@@ -40,11 +40,7 @@ public class ImageDelaunay
         direction = direction.normalized;
 
         for (int i = 1; i < amount - 1; i++)
-        {
-            Vector2 point = direction * interval * i + start;
-            Debug.Log(point + " direction: " + direction);
-            points.Add(point);
-        }
+            points.Add(direction * interval * i + start);
 
         return points;
     }

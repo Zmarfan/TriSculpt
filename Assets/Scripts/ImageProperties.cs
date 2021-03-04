@@ -121,16 +121,3 @@ public class ImageProperties : MonoBehaviour
         return value;
     }
 }
-
-
-/*
-
-    for (int x = 0; x < texture.width; x++)
-        {
-            for (int y = 0; y < texture.height; y++)
-            {
-                newColors[x + y * texture.width] = Color.blue;
-            }
-        }
-
-*/

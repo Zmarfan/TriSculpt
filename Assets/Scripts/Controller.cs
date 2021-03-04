@@ -29,20 +29,19 @@ public class Controller : MonoBehaviour
 
     DisplayDelaunayTriangulation _displayDelaunayTriangulation;
     DisplayTexture _displayTexture;
+    DisplayMesh _displayMesh;
 
     private void Awake()
     {
         _displayDelaunayTriangulation = GetComponentInChildren<DisplayDelaunayTriangulation>();
         _displayTexture = GetComponentInChildren<DisplayTexture>();
+        _displayMesh = GetComponentInChildren<DisplayMesh>();
     }
 
     private void Start()
     {
         Generate();
     }
-
-    List<Triangle> triangulation;
-    List<Vector2> testList;
 
     public void Generate()
     {
@@ -56,19 +55,7 @@ public class Controller : MonoBehaviour
         if (_useColorDepth)
             modTexture = ImageProperties.TextureColorDepth(modTexture, _colorDepth);
         if (_useEntropy)
-        {
-            modTexture = ImageProperties.GetEntropyImage(modTexture, _sampleArea, out float[,] entropyTable);
-
-            List<Vector2> imageDetailPoints = ImageDelaunay.GenerateImageDetailPointsFromEntropy(entropyTable, _pointAmount, _influenceLength, _influenceStrength);
-            imageDetailPoints.AddRange(ImageDelaunay.GenerateBorderPoints(_amountBorderPoints, modTexture.width, modTexture.height));
-
-            Vector2 textureBounds = new Vector2(originalTexture.width * 2 + 1, originalTexture.height * 2 + 1);
-            triangulation = DelaunayTriangulationGenerator.GenerateDelaunayTriangulationWithPoints(imageDetailPoints, textureBounds);
-
-
-            _displayDelaunayTriangulation.Display(triangulation, textureBounds);
-            _displayTexture.transform.position = new Vector3(textureBounds.x / 2, textureBounds.y / 2);
-        }
+            GenerateEntropyTriangulation(modTexture, originalTexture);
 
 
 
@@ -78,5 +65,25 @@ public class Controller : MonoBehaviour
         //List<Triangle> triangulation = DelaunayTriangulationGenerator.GenerateDelaunayTriangulatedGraph(_pointAmount, _bounds);
         //DelaunayTriangulationGenerator.RemoveTrianglesOutsideOfBounds(_bounds, ref triangulation);
         //_displayDelaunayTriangulation.Display(triangulation, _bounds);
+    }
+
+    void GenerateEntropyTriangulation(Texture2D modTexture, Texture2D texture)
+    {
+        modTexture = ImageProperties.GetEntropyImage(modTexture, _sampleArea, out float[,] entropyTable);
+
+        List<Vector2> imageDetailPoints = ImageDelaunay.GenerateImageDetailPointsFromEntropy(entropyTable, _pointAmount, _influenceLength, _influenceStrength);
+
+        List<Vector2> border = ImageDelaunay.GenerateBorderPoints(_amountBorderPoints, modTexture.width, modTexture.height);
+        imageDetailPoints.AddRange(border);
+
+        Vector2 textureBounds = new Vector2(modTexture.width * 2 + 1, modTexture.height * 2 + 1);
+        List<Triangle> triangulation = DelaunayTriangulationGenerator.GenerateDelaunayTriangulationWithPoints(imageDetailPoints, textureBounds);
+
+        _displayDelaunayTriangulation.Display(triangulation, textureBounds);
+        _displayTexture.transform.position = new Vector3(textureBounds.x / 2, textureBounds.y / 2);
+
+
+        Mesh mesh = MeshGenerator.GenerateMeshFromTriangulation(triangulation, texture);
+        _displayMesh.DisplayMeshNow(mesh);
     }
 }
