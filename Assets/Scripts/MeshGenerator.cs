@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MeshGenerator
 {
-    public static Mesh GenerateMeshFromTriangulation(List<Triangle> triangulation, Texture2D texture)
+    public static Mesh GenerateMeshFromTriangulation(List<Triangle> triangulation, Texture2D texture, float gradientRadiusModifier = 1)
     {
         Mesh mesh = new Mesh();
         //3 unique vertices per triangle
@@ -31,10 +31,12 @@ public class MeshGenerator
             Vector2 c = TriangleCenter(vertices[f1], vertices[f2], vertices[f3]);
             float inCircleRadius = TriangleIncircleRadius(vertices[f1], vertices[f2], vertices[f3]);
 
-            Vector2 color1Position = GetColorPositionFromInCircle(c, inCircleRadius, vertices[f1]);
-            Vector2 color2Position = GetColorPositionFromInCircle(c, inCircleRadius, vertices[f2]);
-            Vector2 color3Position = GetColorPositionFromInCircle(c, inCircleRadius, vertices[f3]);
+            Vector2 color1Position = GetColorPositionFromInCircle(c, inCircleRadius * gradientRadiusModifier, vertices[f1]);
+            Vector2 color2Position = GetColorPositionFromInCircle(c, inCircleRadius * gradientRadiusModifier, vertices[f2]);
+            Vector2 color3Position = GetColorPositionFromInCircle(c, inCircleRadius * gradientRadiusModifier, vertices[f3]);
 
+
+            //Gradient (solid if gradientRadiusModifier is 0)
             colors[f1] = texture.GetPixel((int)(color1Position.x - texture.width / 2), (int)(color1Position.y - texture.height / 2));
             colors[f2] = texture.GetPixel((int)(color2Position.x - texture.width / 2), (int)(color2Position.y - texture.height / 2));
             colors[f3] = texture.GetPixel((int)(color3Position.x - texture.width / 2), (int)(color3Position.y - texture.height / 2));

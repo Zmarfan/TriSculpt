@@ -18,6 +18,7 @@ public class Controller : MonoBehaviour
     [SerializeField, Range(1, 256)] int _sampleArea = 4;
     [SerializeField, Range(1, 256)] int _influenceLength = 15;
     [SerializeField, Range(0, 100)] float _influenceStrength = 1.0f;
+    [SerializeField, Range(0, 5)] float _gradientRadiusModifier = 1.0f;
 
     [Header("Display Settings")]
 
@@ -83,7 +84,7 @@ public class Controller : MonoBehaviour
         _displayTexture.transform.position = new Vector3(textureBounds.x / 2, textureBounds.y / 2);
 
 
-        Mesh mesh = MeshGenerator.GenerateMeshFromTriangulation(triangulation, texture);
+        Mesh mesh = MeshGenerator.GenerateMeshFromTriangulation(triangulation, texture, _gradientRadiusModifier);
         _displayMesh.DisplayMeshNow(mesh);
     }
 }
