@@ -5,6 +5,51 @@ using System.Linq;
 
 public class ImageDelaunay
 {
+    public static List<Vector2> GenerateBorderPoints(int amount, int width, int height)
+    {
+        List<Vector2> pointList = new List<Vector2>()
+        {
+            //The corners
+            // 3 2
+            // 0 1
+            new Vector2(width / 2, height / 2),
+            new Vector2(width / 2 + width, height / 2),
+            new Vector2(width / 2 + width, height / 2 + height),
+            new Vector2(width / 2, height / 2 + height)
+        };
+
+        int heightAmount = amount;
+        int widthAmount = (int)((width / (float)height) * amount);
+
+        pointList.AddRange(GenerateLinePoints(widthAmount, width, height, pointList[0], pointList[1]));
+        pointList.AddRange(GenerateLinePoints(heightAmount,width, height,  pointList[1], pointList[2]));
+        pointList.AddRange(GenerateLinePoints(widthAmount, width, height, pointList[2], pointList[3]));
+        pointList.AddRange(GenerateLinePoints(heightAmount,width, height,  pointList[3], pointList[0]));
+
+        return pointList;
+    }
+
+    static List<Vector2> GenerateLinePoints(int amount, int width, int height, Vector2 start, Vector2 end)
+    {
+        //To account for corners
+        amount += 2;
+
+        List<Vector2> points = new List<Vector2>();
+        Vector2 direction = (end - start);
+        float interval = direction.magnitude / (amount - 1);
+        direction = direction.normalized;
+
+        for (int i = 1; i < amount - 1; i++)
+        {
+            Vector2 point = direction * interval * i + start;
+            Debug.Log(point + " direction: " + direction);
+            points.Add(point);
+        }
+
+        return points;
+    }
+
+
     /// <summary>
     /// Gives a list of most interesting pixels (highest entropy) in an image from it's entropyTable
     /// </summary>

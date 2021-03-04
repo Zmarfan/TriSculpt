@@ -9,7 +9,8 @@ public class Controller : MonoBehaviour
     [Header("Main Settings")]
 
     [SerializeField] int _seed;
-    [SerializeField] private int _pointAmount;
+    [SerializeField, Range(0, 5000)] private int _pointAmount;
+    [SerializeField, Range(0, 100)] private int _amountBorderPoints;
     [SerializeField] private Vector2 _bounds;
 
     [SerializeField] Texture2D _texture;
@@ -21,6 +22,7 @@ public class Controller : MonoBehaviour
     [Header("Display Settings")]
 
     [SerializeField] bool _displayTextureState = true;
+    [SerializeField] bool _displayModifiedTexture = true;
     [SerializeField] bool _useBlackWhite = true;
     [SerializeField] bool _useColorDepth = true;
     [SerializeField] bool _useEntropy = true;
@@ -40,41 +42,38 @@ public class Controller : MonoBehaviour
     }
 
     List<Triangle> triangulation;
+    List<Vector2> testList;
 
     public void Generate()
     {
 
         Random.InitState(_seed);
-        Texture2D texture = _texture;
-        float[,] entropyTable = new float[texture.width, texture.height];
+        Texture2D originalTexture = _texture;
+        Texture2D modTexture = originalTexture;
 
         if (_useBlackWhite)
-            texture = ImageProperties.ConvertToBlackAndWhite(texture);
+            modTexture = ImageProperties.ConvertToBlackAndWhite(originalTexture);
         if (_useColorDepth)
-            texture = ImageProperties.TextureColorDepth(texture, _colorDepth);
+            modTexture = ImageProperties.TextureColorDepth(modTexture, _colorDepth);
         if (_useEntropy)
-            texture = ImageProperties.GetEntropyImage(texture, _sampleArea, out entropyTable);
-
-
-        if (entropyTable.GetLength(0) != 0)
         {
-            //Points in texture coordinates
+            modTexture = ImageProperties.GetEntropyImage(modTexture, _sampleArea, out float[,] entropyTable);
+
             List<Vector2> imageDetailPoints = ImageDelaunay.GenerateImageDetailPointsFromEntropy(entropyTable, _pointAmount, _influenceLength, _influenceStrength);
+            imageDetailPoints.AddRange(ImageDelaunay.GenerateBorderPoints(_amountBorderPoints, modTexture.width, modTexture.height));
 
-            foreach (Vector2 point in imageDetailPoints)
-                texture.SetPixel((int)point.x - texture.width / 2, (int)point.y - texture.height / 2, Color.blue);
-
-            texture.Apply();
-
-            Vector2 textureBounds = new Vector2(texture.width * 2 + 1, texture.height * 2 + 1);
+            Vector2 textureBounds = new Vector2(originalTexture.width * 2 + 1, originalTexture.height * 2 + 1);
             triangulation = DelaunayTriangulationGenerator.GenerateDelaunayTriangulationWithPoints(imageDetailPoints, textureBounds);
-            _displayDelaunayTriangulation.Display(triangulation, textureBounds);
 
+
+            _displayDelaunayTriangulation.Display(triangulation, textureBounds);
             _displayTexture.transform.position = new Vector3(textureBounds.x / 2, textureBounds.y / 2);
         }
 
+
+
         if (_displayTextureState)
-            _displayTexture.Display(texture);
+            _displayTexture.Display(_displayModifiedTexture ? modTexture : originalTexture);
 
         //List<Triangle> triangulation = DelaunayTriangulationGenerator.GenerateDelaunayTriangulatedGraph(_pointAmount, _bounds);
         //DelaunayTriangulationGenerator.RemoveTrianglesOutsideOfBounds(_bounds, ref triangulation);

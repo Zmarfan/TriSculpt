@@ -333,13 +333,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _seed: 0
   _pointAmount: 100
+  _amountBorderPoints: 3
   _bounds: {x: 2, y: 2}
-  _texture: {fileID: 2800000, guid: 1e89e6edce5b069489d1e2c5ae566912, type: 3}
-  _colorDepth: 8
+  _texture: {fileID: 2800000, guid: 9c72ff15faf1b374d9d46648221325ab, type: 3}
+  _colorDepth: 2
   _sampleArea: 2
   _influenceLength: 15
   _influenceStrength: 2
   _displayTextureState: 1
+  _displayModifiedTexture: 0
   _useBlackWhite: 0
   _useColorDepth: 1
   _useEntropy: 1
