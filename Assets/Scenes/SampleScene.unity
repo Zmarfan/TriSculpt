@@ -332,17 +332,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _seed: 0
-  _pointAmount: 225
+  _pointAmount: 100
   _amountBorderPoints: 7
   _bounds: {x: 2, y: 2}
-  _texture: {fileID: 2800000, guid: 6eb193213afbd5b4da7de2c5782df145, type: 3}
+  _texture: {fileID: 2800000, guid: 315724fa6eb28f54e9df994498ff0cb9, type: 3}
   _colorDepth: 2
   _sampleArea: 2
   _influenceLength: 15
   _influenceStrength: 2
   _gradientRadiusModifier: 1
   _displayTextureState: 1
-  _displayModifiedTexture: 0
+  _displayModifiedTexture: 1
   _useBlackWhite: 0
   _useColorDepth: 1
   _useEntropy: 1

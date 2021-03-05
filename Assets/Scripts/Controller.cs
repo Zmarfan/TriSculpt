@@ -46,7 +46,6 @@ public class Controller : MonoBehaviour
 
     public void Generate()
     {
-
         Random.InitState(_seed);
         Texture2D originalTexture = _texture;
         Texture2D modTexture = originalTexture;
@@ -56,7 +55,7 @@ public class Controller : MonoBehaviour
         if (_useColorDepth)
             modTexture = ImageProperties.TextureColorDepth(modTexture, _colorDepth);
         if (_useEntropy)
-            GenerateEntropyTriangulation(modTexture, originalTexture);
+            GenerateEntropyTriangulation(ref modTexture, ref originalTexture);
 
 
 
@@ -68,7 +67,7 @@ public class Controller : MonoBehaviour
         //_displayDelaunayTriangulation.Display(triangulation, _bounds);
     }
 
-    void GenerateEntropyTriangulation(Texture2D modTexture, Texture2D texture)
+    void GenerateEntropyTriangulation(ref Texture2D modTexture, ref Texture2D texture)
     {
         modTexture = ImageProperties.GetEntropyImage(modTexture, _sampleArea, out float[,] entropyTable);
 

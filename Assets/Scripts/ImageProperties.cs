@@ -15,11 +15,6 @@ public class ImageProperties : MonoBehaviour
         LookupTable<float, float> lookupTable = new LookupTable<float, float>();
         Histogram histogram = new Histogram();
 
-        //TESTING
-        System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-        stopwatch.Start();
-        int testIterations = 0;
-
         for (int i = 0; i < oldColors.Length; i++)
         {
             int thisY = Mathf.FloorToInt(i / texture.width);
@@ -31,9 +26,6 @@ public class ImageProperties : MonoBehaviour
                 for (int y = Mathf.Max(thisY - sampleArea, 0); y <= thisY + sampleArea && y < texture.height; y++)
                 {
                     histogram.AddPixel(oldColors[x + y * texture.width]);
-
-                    //TESTING
-                    testIterations++;
                 }
             }
 
@@ -43,12 +35,6 @@ public class ImageProperties : MonoBehaviour
             newColors[i] = new Color(entropy / 5f, entropy / 5f, entropy / 5f);
             entropyTable[thisX, thisY] = entropy;
         }
-
-        //TESTING
-        System.TimeSpan ts = stopwatch.Elapsed;
-        stopwatch.Stop();
-        string elapsedTime = string.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-        Debug.Log(elapsedTime + ", Iterations: " + testIterations);
 
         entropyTexture.filterMode = FilterMode.Point;
         entropyTexture.SetPixels(newColors);

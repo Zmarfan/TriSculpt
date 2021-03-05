@@ -158,20 +158,9 @@ public class Histogram
             {
                 return ratio * (float)Math.Log(1 / ratio, 2);
             });
-            //entropy += EntropyPartCalculation(ratio);
         }
 
         return entropy;
-    }
-
-    /// <summary>
-    /// pi * log2(1/pi)
-    /// </summary>
-    /// <param name="amount">amount of this pixel type</param>
-    /// <param name="totalAmount">total amount of pixels</param>
-    float EntropyPartCalculation(float ratio)
-    {
-        return ratio * (float)Math.Log(1 / ratio, 2);
     }
 }
 
