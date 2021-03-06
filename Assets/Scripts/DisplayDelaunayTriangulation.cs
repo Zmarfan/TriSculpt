@@ -32,12 +32,14 @@ public class DisplayDelaunayTriangulation : MonoBehaviour
 
     private void DrawCircles()
     {
+#if UNITY_EDITOR
         UnityEditor.Handles.color = _circleColors;
         for (int i = 0; i < _currentTriangulation.Count; i++)
         {
             if (_displayAll || i == _index)
                 UnityEditor.Handles.DrawWireDisc(_currentTriangulation[i].Center, Vector3.back, _currentTriangulation[i].Radius);
         }
+#endif
     }
 
     private void DrawTriangles()
@@ -55,8 +57,8 @@ public class DisplayDelaunayTriangulation : MonoBehaviour
     {
         Gizmos.color = _superTriangleColors;
 
-        Gizmos.DrawLine(Vector3.up, Vector2.up * _bounds.y);
-        Gizmos.DrawLine(Vector3.zero, Vector2.right * _bounds.x);
+        Gizmos.DrawLine(Vector2.zero, Vector2.up * _bounds.y);
+        Gizmos.DrawLine(Vector2.zero, Vector2.right * _bounds.x);
         Gizmos.DrawLine(Vector2.right * _bounds.x, Vector2.one * _bounds);
         Gizmos.DrawLine(Vector2.up * _bounds.y, Vector2.one * _bounds);
 
@@ -68,6 +70,7 @@ public class DisplayDelaunayTriangulation : MonoBehaviour
 
     private void DrawCircleCenters()
     {
+#if UNITY_EDITOR
         for (int i = 0; i < _currentTriangulation.Count; i++)
         {
             if (_displayAll || i == _index)
@@ -78,6 +81,7 @@ public class DisplayDelaunayTriangulation : MonoBehaviour
                 UnityEditor.Handles.DrawSolidDisc(_currentTriangulation[i].Center, Vector3.back, _circleCenterRadius2);
             }
         }
+#endif
     }
 
     private void OnDrawGizmos()

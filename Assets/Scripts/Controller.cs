@@ -6,12 +6,9 @@ public class Controller : MonoBehaviour
 {
     [Header("Main Settings")]
 
-    [SerializeField] int _seed;
+    [SerializeField] Texture2D _texture;
     [SerializeField, Range(0, 5000)] private int _pointAmount;
     [SerializeField, Range(0, 100)] private int _amountBorderPoints;
-    [SerializeField] private Vector2 _bounds;
-
-    [SerializeField] Texture2D _texture;
     [SerializeField, Range(1, 256)] int _colorDepth = 256;
     [SerializeField, Range(1, 256)] int _sampleArea = 4;
     [SerializeField, Range(1, 256)] int _influenceLength = 15;
@@ -44,7 +41,6 @@ public class Controller : MonoBehaviour
 
     public void Generate()
     {
-        Random.InitState(_seed);
         Texture2D originalTexture = _texture;
         Texture2D modTexture = originalTexture;
 
@@ -59,10 +55,6 @@ public class Controller : MonoBehaviour
 
         if (_displayTextureState)
             _displayTexture.Display(_displayModifiedTexture ? modTexture : originalTexture);
-
-        //List<Triangle> triangulation = DelaunayTriangulationGenerator.GenerateDelaunayTriangulatedGraph(_pointAmount, _bounds);
-        //DelaunayTriangulationGenerator.RemoveTrianglesOutsideOfBounds(_bounds, ref triangulation);
-        //_displayDelaunayTriangulation.Display(triangulation, _bounds);
     }
 
     void GenerateEntropyTriangulation(ref Texture2D modTexture, ref Texture2D texture)

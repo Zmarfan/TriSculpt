@@ -29,12 +29,10 @@ public class MeshGenerator
 
             //Center of triangle
             Vector2 c = TriangleCenter(vertices[f1], vertices[f2], vertices[f3]);
-            float inCircleRadius = TriangleIncircleRadius(vertices[f1], vertices[f2], vertices[f3]);
 
-            Vector2 color1Position = GetColorPositionFromInCircle(c, inCircleRadius * gradientRadiusModifier, vertices[f1]);
-            Vector2 color2Position = GetColorPositionFromInCircle(c, inCircleRadius * gradientRadiusModifier, vertices[f2]);
-            Vector2 color3Position = GetColorPositionFromInCircle(c, inCircleRadius * gradientRadiusModifier, vertices[f3]);
-
+            Vector2 color1Position = Vector2.Lerp(c, vertices[f1], gradientRadiusModifier);
+            Vector2 color2Position = Vector2.Lerp(c, vertices[f2], gradientRadiusModifier);
+            Vector2 color3Position = Vector2.Lerp(c, vertices[f3], gradientRadiusModifier);
 
             //Gradient (solid if gradientRadiusModifier is 0)
             colors[f1] = texture.GetPixel((int)(color1Position.x), (int)(color1Position.y));
@@ -51,18 +49,9 @@ public class MeshGenerator
     }
 
     /// <summary>
-    /// Get point on triangle's incircle perimeter poiting toward target
+    /// Calculate a triangel's inner circles center point by it's corner positions
     /// </summary>
-    /// <param name="center">incircle center point</param>
-    /// <param name="radius">Radius of incircle center point</param>
-    /// <param name="target">Target point</param>
-    static Vector2 GetColorPositionFromInCircle(Vector2 center, float radius, Vector2 target)
-    {
-        Vector2 direction = (target - center).normalized;
-        return direction * radius + center;
-    }
-
-    static Vector2 TriangleCenter(Vector2 A, Vector2 B, Vector2 C)
+    public static Vector2 TriangleCenter(Vector2 A, Vector2 B, Vector2 C)
     {
         float a = (B - C).magnitude;
         float b = (A - C).magnitude;
@@ -73,19 +62,5 @@ public class MeshGenerator
         center.x = (a * A.x + b * B.x + c * C.x) / perimeter;
         center.y = (a * A.y + b * B.y + c * C.y) / perimeter;
         return center;
-    }
-
-    static float TriangleIncircleRadius(Vector2 A, Vector2 B, Vector2 C)
-    {
-        //https://www.mathopenref.com/triangleincircle.html
-        //https://sciencing.com/area-triangle-its-vertices-8489292.html
-        float triangleArea = Mathf.Abs((A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y)) / 2);
-
-        float a = (B - C).magnitude;
-        float b = (A - C).magnitude;
-        float c = (A - B).magnitude;
-        float perimeter = a + b + c;
-
-        return (2 * triangleArea) / perimeter;
     }
 }
