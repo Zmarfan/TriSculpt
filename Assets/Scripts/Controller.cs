@@ -10,10 +10,13 @@ public class Controller : MonoBehaviour
     [SerializeField, Range(0, 5000)] private int _pointAmount;
     [SerializeField, Range(0, 100)] private int _amountBorderPoints;
     [SerializeField, Range(1, 256)] int _colorDepth = 256;
-    [SerializeField, Range(1, 256)] int _sampleArea = 4;
     [SerializeField, Range(1, 256)] int _influenceLength = 15;
     [SerializeField, Range(0, 100)] float _influenceStrength = 1.0f;
     [SerializeField, Range(0, 5)] float _gradientRadiusModifier = 1.0f;
+
+    [Header("No user interference needed")]
+
+    [SerializeField, Range(1, 256)] int _sampleArea = 4;
 
     [Header("Display Settings")]
 
