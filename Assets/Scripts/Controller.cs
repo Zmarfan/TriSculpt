@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Controller : MonoBehaviour
 {
-    public static readonly float OFFSET_EPSILON = 0.001f;
-
     [Header("Main Settings")]
 
     [SerializeField] int _seed;
@@ -72,11 +70,11 @@ public class Controller : MonoBehaviour
         modTexture = ImageProperties.GetEntropyImage(modTexture, _sampleArea, out float[,] entropyTable);
 
         List<Vector2> imageDetailPoints = ImageDelaunay.GenerateImageDetailPointsFromEntropy(entropyTable, _pointAmount, _influenceLength, _influenceStrength);
-
         List<Vector2> border = ImageDelaunay.GenerateBorderPoints(_amountBorderPoints, modTexture.width, modTexture.height);
         imageDetailPoints.AddRange(border);
+        //imageDetailPoints = border;
 
-        Vector2 textureBounds = new Vector2(modTexture.width * 2 + 1, modTexture.height * 2 + 1);
+        Vector2 textureBounds = new Vector2(modTexture.width, modTexture.height);
         List<Triangle> triangulation = DelaunayTriangulationGenerator.GenerateDelaunayTriangulationWithPoints(imageDetailPoints, textureBounds);
 
         _displayDelaunayTriangulation.Display(triangulation, textureBounds);

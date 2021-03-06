@@ -54,18 +54,16 @@ public class DisplayDelaunayTriangulation : MonoBehaviour
     private void DrawSuperTriangle()
     {
         Gizmos.color = _superTriangleColors;
-        if (true)
-        {
-            Gizmos.DrawLine(Vector3.up, Vector2.up * _bounds.y);
-            Gizmos.DrawLine(Vector3.zero, Vector2.right * _bounds.x);
-            Gizmos.DrawLine(Vector2.right * _bounds.x, Vector2.one * _bounds);
-            Gizmos.DrawLine(Vector2.up * _bounds.y, Vector2.one * _bounds);
 
-            Triangle superTriangle = DelaunayTriangulationGenerator.GenerateSuperTriangle(_bounds);
-            Gizmos.DrawLine(superTriangle.A, superTriangle.B);
-            Gizmos.DrawLine(superTriangle.B, superTriangle.C);
-            Gizmos.DrawLine(superTriangle.C, superTriangle.A);
-        }
+        Gizmos.DrawLine(Vector3.up, Vector2.up * _bounds.y);
+        Gizmos.DrawLine(Vector3.zero, Vector2.right * _bounds.x);
+        Gizmos.DrawLine(Vector2.right * _bounds.x, Vector2.one * _bounds);
+        Gizmos.DrawLine(Vector2.up * _bounds.y, Vector2.one * _bounds);
+
+        Triangle superTriangle = DelaunayTriangulationGenerator.GenerateSuperTriangle(_bounds);
+        Gizmos.DrawLine(superTriangle.A, superTriangle.B);
+        Gizmos.DrawLine(superTriangle.B, superTriangle.C);
+        Gizmos.DrawLine(superTriangle.C, superTriangle.A);
     }
 
     private void DrawCircleCenters()

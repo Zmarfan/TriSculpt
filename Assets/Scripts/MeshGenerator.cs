@@ -37,9 +37,9 @@ public class MeshGenerator
 
 
             //Gradient (solid if gradientRadiusModifier is 0)
-            colors[f1] = texture.GetPixel((int)(color1Position.x - texture.width / 2), (int)(color1Position.y - texture.height / 2));
-            colors[f2] = texture.GetPixel((int)(color2Position.x - texture.width / 2), (int)(color2Position.y - texture.height / 2));
-            colors[f3] = texture.GetPixel((int)(color3Position.x - texture.width / 2), (int)(color3Position.y - texture.height / 2));
+            colors[f1] = texture.GetPixel((int)(color1Position.x), (int)(color1Position.y));
+            colors[f2] = texture.GetPixel((int)(color2Position.x), (int)(color2Position.y));
+            colors[f3] = texture.GetPixel((int)(color3Position.x), (int)(color3Position.y));
         }
 
         mesh.vertices = vertices;

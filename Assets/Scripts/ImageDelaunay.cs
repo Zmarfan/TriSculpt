@@ -12,24 +12,24 @@ public class ImageDelaunay
             //The corners
             // 3 2
             // 0 1
-            new Vector2(width / 2, height / 2),
-            new Vector2(width / 2 + width, height / 2),
-            new Vector2(width / 2 + width, height / 2 + height),
-            new Vector2(width / 2, height / 2 + height)
+            new Vector2(0, 0),
+            new Vector2(width, 0),
+            new Vector2(width, height),
+            new Vector2(0, height)
         };
 
         int heightAmount = amount;
         int widthAmount = (int)((width / (float)height) * amount);
 
-        pointList.AddRange(GenerateLinePoints(widthAmount, width, height, pointList[0], pointList[1]));
-        pointList.AddRange(GenerateLinePoints(heightAmount,width, height,  pointList[1], pointList[2]));
-        pointList.AddRange(GenerateLinePoints(widthAmount, width, height, pointList[2], pointList[3]));
-        pointList.AddRange(GenerateLinePoints(heightAmount,width, height,  pointList[3], pointList[0]));
+        pointList.AddRange(GenerateLinePoints(widthAmount, pointList[0], pointList[1]));
+        pointList.AddRange(GenerateLinePoints(heightAmount, pointList[1], pointList[2]));
+        pointList.AddRange(GenerateLinePoints(widthAmount, pointList[2], pointList[3]));
+        pointList.AddRange(GenerateLinePoints(heightAmount,  pointList[3], pointList[0]));
 
         return pointList;
     }
 
-    static List<Vector2> GenerateLinePoints(int amount, int width, int height, Vector2 start, Vector2 end)
+    static List<Vector2> GenerateLinePoints(int amount, Vector2 start, Vector2 end)
     {
         //To account for corners
         amount += 2;
@@ -63,7 +63,7 @@ public class ImageDelaunay
         for (int i = 0; i < pointAmount; i++)
         {
             FindMaxValueIndexes(in entropyTable, out int x, out int y);
-            points.Add(new Vector2Int(x + width / 2, y + height / 2));
+            points.Add(new Vector2Int(x, y));
             //Lower the entropy of points around last max entropy pixel
             AffectNearbyEntropyLevels(x, y, influenceLength, influenceStrength, ref entropyTable);
         }
@@ -125,8 +125,6 @@ public class ImageDelaunay
 
                 float affectValue = (Mathf.Abs(x) + Mathf.Abs(y)) / (float)(influenceLength * 2);
                 entropyTable[thisX + x, thisY + y] *= Mathf.Clamp(affectValue * (1 / influenceStrength), 0, 1);
-
-                //Debug.Log("x: " + x + ", y: " + y + ", old Entropy: " + old + ", new Entropy: " + entropyTable[thisX + x, thisY + y] + ", affect value: " + affectValue);
             }
         }
     }

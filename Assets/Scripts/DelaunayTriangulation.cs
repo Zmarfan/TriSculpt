@@ -9,7 +9,7 @@ public class DelaunayTriangulationGenerator : MonoBehaviour
     public static List<Triangle> GenerateDelaunayTriangulationWithPoints(List<Vector2> points, Vector2 bounds)
     {
         Triangle superTriangle = GenerateSuperTriangle(bounds);
-        List<Triangle> triangulation = BowyerWatson(new List<Triangle> { superTriangle }, points, bounds);
+        List<Triangle> triangulation = BowyerWatson(new List<Triangle> { superTriangle }, points);
 
         // Removes super triangle
         for (int i = triangulation.Count - 1; i >= 0; i--)
@@ -43,7 +43,7 @@ public class DelaunayTriangulationGenerator : MonoBehaviour
         return points;
     }
 
-    public static List<Triangle> BowyerWatson(List<Triangle> mesh, List<Vector2> points, Vector2 bounds)
+    public static List<Triangle> BowyerWatson(List<Triangle> mesh, List<Vector2> points)
     {
         List<Triangle> triangulation = mesh;
 
@@ -110,13 +110,16 @@ public class DelaunayTriangulationGenerator : MonoBehaviour
     /// <param name="angle">Aesthetic, leave blank if unsure (0 - 90)</param>
     public static Triangle GenerateSuperTriangle(Vector2 innerBounds, float angle = 45)
     {
+        //Used to be able to include points that are on the triangle perimeter
+        float epsilon = 1f;
+
         angle = Mathf.Clamp(angle, 0f, 90f);
 
         float angleA = angle;
         float angleB = 90 - angle;
-        Vector2 pointA = new Vector2(0, innerBounds.y + innerBounds.x * Mathf.Tan(angleA * Mathf.Deg2Rad));
-        Vector2 pointB = Vector2.zero;
-        Vector2 pointC = new Vector2(innerBounds.x + innerBounds.y * Mathf.Tan(angleB * Mathf.Deg2Rad), 0);
+        Vector2 pointA = new Vector2(-epsilon, epsilon + innerBounds.y + innerBounds.x * Mathf.Tan(angleA * Mathf.Deg2Rad));
+        Vector2 pointB = new Vector2(-epsilon, -epsilon);
+        Vector2 pointC = new Vector2(epsilon + innerBounds.x + innerBounds.y * Mathf.Tan(angleB * Mathf.Deg2Rad), -epsilon);
         return new Triangle(pointA, pointB, pointC);
     }
 }
