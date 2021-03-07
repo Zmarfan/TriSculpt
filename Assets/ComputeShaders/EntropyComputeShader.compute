@@ -8,7 +8,6 @@ struct Histogram
 
 Texture2D<float4> inputTexture;
 RWStructuredBuffer<float> pixelEntropies;
-SamplerState samplerinput;
 int width;
 int height;
 int sampleArea;
