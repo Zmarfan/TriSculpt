@@ -53,19 +53,16 @@ public class ImageDelaunay
     /// <param name="pointAmount">Amount of interesting points to find</param>
     /// <param name="influenceLength">How far apart the points should be</param>
     /// <param name="influenceStrength">How strong the influence is</param>
-    public static List<Vector2> GenerateImageDetailPointsFromEntropy(float[,] entropyTable, int pointAmount, int influenceLength, float influenceStrength)
+    public static List<Vector2> GenerateImageDetailPointsFromEntropy(int width, int height, float[] entropyTable, int pointAmount, int influenceLength, float influenceStrength)
     {
-        int width = entropyTable.GetLength(0);
-        int height = entropyTable.GetLength(1);
-
         List<Vector2> points = new List<Vector2>();
 
         for (int i = 0; i < pointAmount; i++)
         {
-            FindMaxValueIndexes(in entropyTable, out int x, out int y);
+            FindMaxValueIndexes(in entropyTable, width, out int x, out int y);
             points.Add(new Vector2Int(x, y));
             //Lower the entropy of points around last max entropy pixel
-            AffectNearbyEntropyLevels(x, y, influenceLength, influenceStrength, ref entropyTable);
+            AffectNearbyEntropyLevels(x, y, width, height, influenceLength, influenceStrength, ref entropyTable);
         }
 
         return points;
@@ -77,22 +74,19 @@ public class ImageDelaunay
     /// <param name="entropyTable">Table of entropy for an image pixels (x*y resolution)</param>
     /// <param name="outX">index x of max value</param>
     /// <param name="outY">index y of max value</param>
-    static void FindMaxValueIndexes(in float[,] entropyTable, out int outX, out int outY)
+    static void FindMaxValueIndexes(in float[] entropyTable, int width, out int outX, out int outY)
     {
-        float currentMax = entropyTable[0, 0];
+        float currentMax = entropyTable[0];
         outX = 0;
         outY = 0;
 
-        for (int x = 0; x < entropyTable.GetLength(0); x++)
+        for (int i = 0; i < entropyTable.Length; i++)
         {
-            for (int y = 0; y < entropyTable.GetLength(1); y++)
+            if (entropyTable[i] > currentMax)
             {
-                if (entropyTable[x, y] > currentMax)
-                {
-                    currentMax = entropyTable[x, y];
-                    outX = x;
-                    outY = y;
-                }
+                currentMax = entropyTable[i];
+                outY = Mathf.FloorToInt(i / width);
+                outX = i - outY * width;
             }
         }
     }
@@ -104,11 +98,8 @@ public class ImageDelaunay
     /// <param name="thisY">This pixel y coord</param>
     /// <param name="influenceLength">How far around the pixel affect entropy</param>
     /// <param name="influenceStrength">How strongly should surrounding pixels be affected</param>
-    static void AffectNearbyEntropyLevels(int thisX, int thisY, int influenceLength, float influenceStrength, ref float[,] entropyTable)
+    static void AffectNearbyEntropyLevels(int thisX, int thisY, int width, int height, int influenceLength, float influenceStrength, ref float[] entropyTable)
     {
-        int width = entropyTable.GetLength(0);
-        int height = entropyTable.GetLength(1);
-
         for (int x = -influenceLength; x <= influenceLength; x++)
         {
             //This index is out of bounds
@@ -121,10 +112,10 @@ public class ImageDelaunay
                 if (thisY + y < 0 || thisY + y >= height)
                     continue;
 
-                float old = entropyTable[thisX + x, thisY + y];
+                float old = entropyTable[thisX + x + (thisY + y) * width];
 
                 float affectValue = (Mathf.Abs(x) + Mathf.Abs(y)) / (float)(influenceLength * 2);
-                entropyTable[thisX + x, thisY + y] *= Mathf.Clamp(affectValue * (1 / influenceStrength), 0, 1);
+                entropyTable[thisX + x + (thisY + y) * width] *= Mathf.Clamp(affectValue * (1 / influenceStrength), 0, old);
             }
         }
     }

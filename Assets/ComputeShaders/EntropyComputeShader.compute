@@ -1,0 +1,76 @@
+﻿#pragma kernel CSMain
+
+struct Histogram
+{
+	uint4 color;
+	uint amount;
+};
+
+Texture2D<float4> inputTexture;
+RWStructuredBuffer<float> pixelEntropies;
+SamplerState samplerinput;
+int width;
+int height;
+int sampleArea;
+
+[numthreads(128,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	uint pixelIndex = id.x;
+
+	//Out of bounds
+	if (id.x >= (uint)(width * height))
+	{
+		return;
+	}
+
+	int thisY = pixelIndex / int(width);
+	int thisX = pixelIndex % int(width);
+
+	//Can max be 25 different colors in a 5x5 area
+	Histogram histogram[25];
+	uint amountOfDifferentColors = 0;
+	uint amountOfPixels = 0;
+
+	//Loop over all pixels surrounding this pixel
+	for (int x = max(thisX - sampleArea, 0); x <= thisX + sampleArea && thisX < width; x++)
+	{
+		for (int y = max(thisY - sampleArea, 0); y <= thisY + sampleArea && thisY < height; y++)
+		{
+			//Pixel currently looking at
+			uint4 color = (uint4)(255.0 * inputTexture[uint2(x, y)]);
+
+			//Add into histogram
+			for (uint i = 0; i < histogram.Length; i++)
+			{
+				//First instance of this pixel color
+				if (i == amountOfDifferentColors)
+				{
+					histogram[i].color = color;
+					histogram[i].amount = 1;
+					amountOfPixels++;
+					amountOfDifferentColors++;
+					break;
+				}
+				//Increment pixel count for this color type
+				else if (histogram[i].color.r == color.r && histogram[i].color.g == color.g &&
+					histogram[i].color.b == color.b && histogram[i].color.a == color.a)
+				{
+					histogram[i].amount = histogram[i].amount + 1;
+					amountOfPixels++;
+					break;
+				}			
+			}
+		}
+	}
+
+	float entropy = 0;
+	//Loop through all saved colors to calculate entropy for this pixel
+	for (uint i = 0; i < amountOfDifferentColors; i++)
+	{
+		float ratio = (float)histogram[i].amount / (float)amountOfPixels;
+		entropy = entropy + ratio * log2(1 / ratio);
+	}
+
+	pixelEntropies[pixelIndex] = entropy;
+}

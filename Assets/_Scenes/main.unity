@@ -1620,13 +1620,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3a42d860f5e78143bee525bb1d65c77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _texture: {fileID: 2800000, guid: 4bf26f6bcfbe1f940a2d348386924539, type: 3}
+  _computeShader: {fileID: 7200000, guid: 197d2bd10bbce2f44a9434feb8d5de85, type: 3}
+  _texture: {fileID: 2800000, guid: 210ae4b95727ea64faff4cf648cf989c, type: 3}
   _pointAmount: 100
   _amountBorderPoints: 7
   _colorDepth: 2
   _influenceLength: 15
   _influenceStrength: 2
-  _gradientRadiusModifier: 1
+  _gradientRadiusModifier: 0.5
   _sampleArea: 2
   _displayTextureState: 1
   _displayModifiedTexture: 1
@@ -4022,7 +4023,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1618279799}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 0}
 --- !u!114 &1618279803
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4987,7 +4988,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 502663361}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 50
+  m_MaxValue: 100
   m_WholeNumbers: 1
   m_Value: 15
   m_OnValueChanged:

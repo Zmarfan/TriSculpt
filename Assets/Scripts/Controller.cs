@@ -1,9 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.Diagnostics;
 
 public class Controller : MonoBehaviour
 {
+    [Header("Shader")]
+
+    [SerializeField] ComputeShader _computeShader;
+
     [Header("Main Settings")]
 
     [SerializeField] Texture2D _texture;
@@ -12,7 +18,7 @@ public class Controller : MonoBehaviour
     [SerializeField, Range(1, 256)] int _colorDepth = 256;
     [SerializeField, Range(1, 256)] int _influenceLength = 15;
     [SerializeField, Range(0, 100)] float _influenceStrength = 1.0f;
-    [SerializeField, Range(0, 5)] float _gradientRadiusModifier = 1.0f;
+    [SerializeField, Range(0, 1)] float _gradientRadiusModifier = 1.0f;
 
     [Header("No user interference needed")]
 
@@ -62,9 +68,30 @@ public class Controller : MonoBehaviour
 
     void GenerateEntropyTriangulation(ref Texture2D modTexture, ref Texture2D texture)
     {
-        modTexture = ImageProperties.GetEntropyImage(modTexture, _sampleArea, out float[,] entropyTable);
+        float[] pixelEntropies = new float[modTexture.width * modTexture.height];
 
-        List<Vector2> imageDetailPoints = ImageDelaunay.GenerateImageDetailPointsFromEntropy(entropyTable, _pointAmount, _influenceLength, _influenceStrength);
+        ComputeBuffer entropyBuffer = new ComputeBuffer(pixelEntropies.Length, sizeof(float));
+        entropyBuffer.SetData(pixelEntropies);
+
+        //Buffer compute shader writes to
+        _computeShader.SetBuffer(0, "pixelEntropies", entropyBuffer);
+        //Relevant variables compute shader needs
+
+        _computeShader.SetTexture(0, "inputTexture", modTexture);
+        _computeShader.SetInt("width", modTexture.width);
+        _computeShader.SetInt("height", modTexture.height);
+        _computeShader.SetInt("sampleArea", _sampleArea);
+
+        //Start shader
+        _computeShader.Dispatch(0, (pixelEntropies.Length + 127) / 128, 1, 1);
+
+        //Read in computated data and release buffer
+        entropyBuffer.GetData(pixelEntropies);
+        entropyBuffer.Release();
+
+        List<Vector2> imageDetailPoints = ImageDelaunay.GenerateImageDetailPointsFromEntropy(modTexture.width, modTexture.height, pixelEntropies, _pointAmount, _influenceLength, _influenceStrength);
+
+
         List<Vector2> border = ImageDelaunay.GenerateBorderPoints(_amountBorderPoints, modTexture.width, modTexture.height);
         imageDetailPoints.AddRange(border);
         //imageDetailPoints = border;
