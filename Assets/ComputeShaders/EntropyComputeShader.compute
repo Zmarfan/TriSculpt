@@ -12,7 +12,7 @@ int width;
 int height;
 int sampleArea;
 
-[numthreads(128,1,1)]
+[numthreads(256,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
 	uint pixelIndex = id.x;

@@ -8,9 +8,9 @@ public class ControllerEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        Controller controller = (Controller)target;
-        if (GUILayout.Button("Refresh"))
-            controller.Generate();
-        DrawDefaultInspector();
+        //Controller controller = (Controller)target;
+        //if (GUILayout.Button("Refresh"))
+        //    controller.Generate();
+        //DrawDefaultInspector();
     }
 }

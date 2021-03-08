@@ -12,7 +12,6 @@ public class Controller : MonoBehaviour
 
     [Header("Main Settings")]
 
-    [SerializeField] Texture2D _texture;
     [SerializeField, Range(0, 5000)] private int _pointAmount;
     [SerializeField, Range(0, 100)] private int _amountBorderPoints;
     [SerializeField, Range(1, 256)] int _colorDepth = 256;
@@ -23,6 +22,7 @@ public class Controller : MonoBehaviour
     [Header("No user interference needed")]
 
     [SerializeField, Range(1, 256)] int _sampleArea = 4;
+    [SerializeField] CameraScript _cameraScript;
 
     [Header("Display Settings")]
 
@@ -43,32 +43,18 @@ public class Controller : MonoBehaviour
         _displayMesh = GetComponentInChildren<DisplayMesh>();
     }
 
-    public void SetTexture(Texture2D texture)
-    {
-        _texture = texture;
-        Generate();
-    }
 
-    public void Generate()
+    /// <summary>
+    /// Generate a texture of a mesh from current input
+    /// </summary>
+    /// <returns></returns>
+    public Texture2D Generate(Texture2D texture)
     {
-        Texture2D originalTexture = _texture;
+        Texture2D originalTexture = texture;
         Texture2D modTexture = originalTexture;
 
-        if (_useBlackWhite)
-            modTexture = ImageProperties.ConvertToBlackAndWhite(originalTexture);
-        if (_useColorDepth)
-            modTexture = ImageProperties.TextureColorDepth(modTexture, _colorDepth);
-        if (_useEntropy)
-            GenerateEntropyTriangulation(ref modTexture, ref originalTexture);
+        modTexture = ImageProperties.TextureColorDepth(modTexture, _colorDepth);
 
-
-
-        if (_displayTextureState)
-            _displayTexture.Display(_displayModifiedTexture ? modTexture : originalTexture);
-    }
-
-    void GenerateEntropyTriangulation(ref Texture2D modTexture, ref Texture2D texture)
-    {
         float[] pixelEntropies = new float[modTexture.width * modTexture.height];
 
         ComputeBuffer entropyBuffer = new ComputeBuffer(pixelEntropies.Length, sizeof(float));
@@ -84,7 +70,7 @@ public class Controller : MonoBehaviour
         _computeShader.SetInt("sampleArea", _sampleArea);
 
         //Start shader
-        _computeShader.Dispatch(0, (pixelEntropies.Length + 127) / 128, 1, 1);
+        _computeShader.Dispatch(0, (pixelEntropies.Length + 255) / 256, 1, 1);
 
         //Read in computated data and release buffer
         entropyBuffer.GetData(pixelEntropies);
@@ -104,7 +90,11 @@ public class Controller : MonoBehaviour
         _displayTexture.transform.position = new Vector3(textureBounds.x / 2, textureBounds.y / 2);
 
 
-        Mesh mesh = MeshGenerator.GenerateMeshFromTriangulation(triangulation, texture, _gradientRadiusModifier);
+        Mesh mesh = MeshGenerator.GenerateMeshFromTriangulation(triangulation, originalTexture, _gradientRadiusModifier);
         _displayMesh.DisplayMeshNow(mesh);
+
+        Texture2D meshTexture = _cameraScript.SetCameraToTexture(textureBounds.x, textureBounds.y);
+
+        return meshTexture;
     }
 }
