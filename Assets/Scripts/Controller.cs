@@ -43,8 +43,9 @@ public class Controller : MonoBehaviour
         _displayMesh = GetComponentInChildren<DisplayMesh>();
     }
 
-    private void Start()
+    public void SetTexture(Texture2D texture)
     {
+        _texture = texture;
         Generate();
     }
 
