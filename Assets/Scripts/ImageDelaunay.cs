@@ -49,23 +49,36 @@ public class ImageDelaunay
     /// <summary>
     /// Gives a list of most interesting pixels (highest entropy) in an image from it's entropyTable
     /// </summary>
-    /// <param name="entropyTable">Entropy table of a texture</param>
+    /// <param name="textureEntropy">Entropy table of a texture</param>
     /// <param name="pointAmount">Amount of interesting points to find</param>
     /// <param name="influenceLength">How far apart the points should be</param>
     /// <param name="influenceStrength">How strong the influence is</param>
-    public static List<Vector2> GenerateImageDetailPointsFromEntropy(int width, int height, float[] entropyTable, int pointAmount, int influenceLength, float influenceStrength)
+    public static List<Vector2> GenerateImageDetailPointsFromEntropy(int width, int height, float[] inEntropy, int pointAmount, int influenceLength, float influenceStrength)
     {
+        //Since this table will be changed here we want to do it on a copy
+        float[] textureEntropy = CopyEntropyTable(inEntropy);
         List<Vector2> points = new List<Vector2>();
 
         for (int i = 0; i < pointAmount; i++)
         {
-            FindMaxValueIndexes(in entropyTable, width, out int x, out int y);
+            FindMaxValueIndexes(in textureEntropy, width, out int x, out int y);
             points.Add(new Vector2Int(x, y));
             //Lower the entropy of points around last max entropy pixel
-            AffectNearbyEntropyLevels(x, y, width, height, influenceLength, influenceStrength, ref entropyTable);
+            AffectNearbyEntropyLevels(x, y, width, height, influenceLength, influenceStrength, ref textureEntropy);
         }
 
         return points;
+    }
+
+    /// <summary>
+    /// Copies inEntropy as to not change it by reference in this script
+    /// </summary>
+    static float[] CopyEntropyTable(float[] inEntropy)
+    {
+        float[] copy = new float[inEntropy.Length];
+        for (int i = 0; i < inEntropy.Length; i++)
+            copy[i] = inEntropy[i];
+        return copy;
     }
 
     /// <summary>

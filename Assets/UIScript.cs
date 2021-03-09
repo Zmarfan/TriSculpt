@@ -8,11 +8,22 @@ public class UIScript : MonoBehaviour
 {
     [Header("Settings")]
 
-    [SerializeField]
-    List<string> _validImageTypes = new List<string>() { ".png", ".jpg" };
+    [SerializeField] bool _changeResolutionPoint = true;
+    [SerializeField] int _maxResolutionDimension = 350; //No need for too many pixels to loop over, details aren't that important for triangles
+    [SerializeField] List<string> _validImageTypes = new List<string>() { ".png", ".jpg" };
+
+    [Header("Sliders")]
+
+    [SerializeField] Slider _detailAccuracySlider;
+    [SerializeField] Slider _amountOfPointsSlider;
+    [SerializeField] Slider _borderPointAmountSlider;
+    [SerializeField] Slider _pointInfluenceLengthSlider;
+    [SerializeField] Slider _pointInfluenceStrengthSlider;
+    [SerializeField] Slider _cornerColorSamplePointSlider;
 
     [Header("Drop")]
 
+    [SerializeField] Image _originalTextureImage;
     [SerializeField] Image _displayCurrentMeshImage;
     [SerializeField] Text _filePathText;
     [SerializeField] Controller _controllerScript;
@@ -30,12 +41,33 @@ public class UIScript : MonoBehaviour
         foreach (string type in _validImageTypes)
             _validImageTypeHashSet.Add(type);
     }
+    
+    public void HardGenerate()
+    {
+        _controllerScript.NeedNewEntropy();
+        NormalGenerate();
+    }
 
+    /// <summary>
+    /// Generate which doesn't need to recalculate entropy
+    /// </summary>
+    public void NormalGenerate()
+    {
+        _controllerScript.NeedNewPoints();
+        Generate();
+    }
+
+    /// <summary>
+    /// Only called directly from color sample slider since it doesn't need to recalculate entropy or points
+    /// </summary>
     public void Generate()
     {
+        _controllerScript.SetParameters(_detailAccuracySlider.value, _amountOfPointsSlider.value,
+                                        _borderPointAmountSlider.value, _pointInfluenceLengthSlider.value,
+                                        _pointInfluenceStrengthSlider.value, _cornerColorSamplePointSlider.value);
+
         Texture2D meshTexture = _controllerScript.Generate(_inputTexture);
-        Sprite meshSprite = Sprite.Create(meshTexture, new Rect(0, 0, meshTexture.width, meshTexture.height), new Vector2(0.5f, 0.5f));
-        _displayCurrentMeshImage.sprite = meshSprite;
+        _displayCurrentMeshImage.sprite = SpriteFromTexture(meshTexture);
     }
 
     /// <summary>
@@ -85,7 +117,58 @@ public class UIScript : MonoBehaviour
         Texture2D texture = new Texture2D(64, 64, TextureFormat.ARGB32, false);
         texture.LoadImage(data);
         texture.name = Path.GetFileNameWithoutExtension(filePath);
-        _inputTexture = texture;
-        Generate();
+        _originalTextureImage.sprite = SpriteFromTexture(texture);
+        _inputTexture = ResizeTexture(texture);
+        HardGenerate();
+    }
+
+    /// <summary>
+    /// Creates a Sprite from a 2DTexture
+    /// </summary>
+    Sprite SpriteFromTexture(Texture2D texture)
+    {
+        return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+    }
+
+    Texture2D ResizeTexture(Texture2D texture)
+    {
+        Texture2D modTexture = new Texture2D(texture.width, texture.height);
+        modTexture.SetPixels(texture.GetPixels());
+        modTexture.Apply();
+
+        if (NeedToResizeTexture(modTexture, out int newWidth, out int newHeight))
+        {
+            if (_changeResolutionPoint)
+                ImageProperties.ResizeTexturePoint(newWidth, newHeight, ref modTexture);
+            else
+                ImageProperties.ResizeTextureBilinear(newWidth, newHeight, ref modTexture);
+        }
+
+        return modTexture;
+    }
+
+    /// <summary>
+    /// Checks if input texture is too big or not for the algorithm. If it is, calculate appropriate image size 
+    /// </summary>
+    /// <param name="texture">Input texture</param>
+    /// <param name="newWidth">New width if it is too big</param>
+    /// <param name="newHeight">New Height if it is too big</param>
+    bool NeedToResizeTexture(Texture2D texture, out int newWidth, out int newHeight)
+    {
+        newWidth = texture.width;
+        newHeight = texture.height;
+
+        //Good size already
+        if (texture.width < _maxResolutionDimension && texture.height < _maxResolutionDimension)
+            return false;
+        //What resolution should it resize to?
+
+        float ratioX = _maxResolutionDimension / (float)texture.width;
+        float ratioY = _maxResolutionDimension / (float)texture.height;
+        float ratio = ratioX < ratioY ? ratioX : ratioY;
+
+        newWidth = (int)(texture.width * ratio);
+        newHeight = (int)(texture.height * ratio);
+        return true;
     }
 }

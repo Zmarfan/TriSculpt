@@ -6,59 +6,106 @@ using System.Diagnostics;
 
 public class Controller : MonoBehaviour
 {
-    [Header("Shader")]
+    static readonly int DETAIL_ACCURACY_MIN = 16;
+
+    [Header("Settings")]
 
     [SerializeField] ComputeShader _computeShader;
-
-    [Header("Main Settings")]
-
-    [SerializeField, Range(0, 5000)] private int _pointAmount;
-    [SerializeField, Range(0, 100)] private int _amountBorderPoints;
-    [SerializeField, Range(1, 256)] int _colorDepth = 256;
-    [SerializeField, Range(1, 256)] int _influenceLength = 15;
-    [SerializeField, Range(0, 100)] float _influenceStrength = 1.0f;
-    [SerializeField, Range(0, 1)] float _gradientRadiusModifier = 1.0f;
-
-    [Header("No user interference needed")]
-
     [SerializeField, Range(1, 256)] int _sampleArea = 4;
     [SerializeField] CameraScript _cameraScript;
 
-    [Header("Display Settings")]
-
-    [SerializeField] bool _displayTextureState = true;
-    [SerializeField] bool _displayModifiedTexture = true;
-    [SerializeField] bool _useBlackWhite = true;
-    [SerializeField] bool _useColorDepth = true;
-    [SerializeField] bool _useEntropy = true;
-
     DisplayDelaunayTriangulation _displayDelaunayTriangulation;
-    DisplayTexture _displayTexture;
-    DisplayMesh _displayMesh;
+    MeshFilter _meshFilter;
+
+    //Parameters for Mesh Generation (odd init values to make sure a full generation is done first time)
+    int _colorDepth = int.MinValue;
+    int _pointAmount;
+    int _amountBorderPoints;
+    int _influenceLength = 15;
+    float _influenceStrength = 1.0f;
+    float _gradientRadiusModifier = 1.0f;
+
+    //True if _colorDepth isn't being changed after first Generation -> no need to calculate entropy again if true
+    bool _hasEntropyData = false;
+    //True if _pointAmount, _amountBorderPoints, _influenceLength/Strength isn't being changed && _hasEntropyData == true
+    bool _hasPointPlacementData = false;
+
+    float[] _storedEntropy;
+    List<Triangle> _triangulation;
 
     private void Awake()
     {
         _displayDelaunayTriangulation = GetComponentInChildren<DisplayDelaunayTriangulation>();
-        _displayTexture = GetComponentInChildren<DisplayTexture>();
-        _displayMesh = GetComponentInChildren<DisplayMesh>();
+        _meshFilter = GetComponentInChildren<MeshFilter>();
     }
 
+    public void NeedNewEntropy()
+    {
+        _hasEntropyData = false;
+    }
+
+    public void NeedNewPoints()
+    {
+        _hasPointPlacementData = false;
+    }
+
+    /// <summary>
+    /// Set parameters based of user input to calculate mesh by correct settings
+    /// </summary>
+    /// <param name="detailAccuracy">How precise the algorithm can detect points of interest in the image. 0 - 64 where 64 = highest possible</param>
+    /// <param name="amountOfPoints">Amount of points to make up the triangulation mesh</param>
+    /// <param name="borderPointAmount">How many points per side in the border</param>
+    /// <param name="pointInfluenceLength">How much influence a placed point has to having points placed close to it.</param>
+    /// <param name="pointInfluenceStrength">How strong that influence is</param>
+    /// <param name="cornerColorSamplePoint">How the colors should be sampled for each triangle</param>
+    public void SetParameters(float detailAccuracy, float amountOfPoints, float borderPointAmount, float pointInfluenceLength, float pointInfluenceStrength, float cornerColorSamplePoint)
+    {
+        //Convert to 0-16 range where 0 -> high detail
+        _colorDepth = DETAIL_ACCURACY_MIN - (int)detailAccuracy;
+        _pointAmount = (int)amountOfPoints;
+        _amountBorderPoints = (int)borderPointAmount;
+        _influenceLength = (int)pointInfluenceLength;
+        _influenceStrength = pointInfluenceStrength;
+        _gradientRadiusModifier = cornerColorSamplePoint;
+    }
 
     /// <summary>
     /// Generate a texture of a mesh from current input
     /// </summary>
     /// <returns></returns>
-    public Texture2D Generate(Texture2D texture)
+    public Texture2D Generate(Texture2D modTexture)
     {
-        Texture2D originalTexture = texture;
-        Texture2D modTexture = originalTexture;
+        int width = modTexture.width;
+        int height = modTexture.height;
 
+        if (!_hasEntropyData)
+            CalculateEntropyForTexture(modTexture);
+        if (!_hasPointPlacementData)
+            CalculateTriangulationFromEntropy(width, height);
+
+        //If nothing has been done up until this point -> only _gradientRadiusModifier was changed
+        Texture2D finalImage = CalculateFinalMeshTexture(modTexture, width, height);
+
+        //Everything is now stored
+        _hasEntropyData = true;
+        _hasPointPlacementData = true;
+
+        return finalImage;
+    }
+
+    /// <summary>
+    /// Calculate Entropy for certain texture
+    /// </summary>
+    /// <param name="modTexture"></param>
+    void CalculateEntropyForTexture(Texture2D texture)
+    {
+        //Modify color depth of texture to bypass compression noise
+        Texture2D modTexture = texture;
         modTexture = ImageProperties.TextureColorDepth(modTexture, _colorDepth);
 
-        float[] pixelEntropies = new float[modTexture.width * modTexture.height];
-
-        ComputeBuffer entropyBuffer = new ComputeBuffer(pixelEntropies.Length, sizeof(float));
-        entropyBuffer.SetData(pixelEntropies);
+        _storedEntropy = new float[modTexture.width * modTexture.height];
+        ComputeBuffer entropyBuffer = new ComputeBuffer(_storedEntropy.Length, sizeof(float));
+        entropyBuffer.SetData(_storedEntropy);
 
         //Buffer compute shader writes to
         _computeShader.SetBuffer(0, "pixelEntropies", entropyBuffer);
@@ -70,31 +117,34 @@ public class Controller : MonoBehaviour
         _computeShader.SetInt("sampleArea", _sampleArea);
 
         //Start shader
-        _computeShader.Dispatch(0, (pixelEntropies.Length + 255) / 256, 1, 1);
+        _computeShader.Dispatch(0, (_storedEntropy.Length + 255) / 256, 1, 1);
 
         //Read in computated data and release buffer
-        entropyBuffer.GetData(pixelEntropies);
+        entropyBuffer.GetData(_storedEntropy);
         entropyBuffer.Release();
+    }
 
-        List<Vector2> imageDetailPoints = ImageDelaunay.GenerateImageDetailPointsFromEntropy(modTexture.width, modTexture.height, pixelEntropies, _pointAmount, _influenceLength, _influenceStrength);
-
-
-        List<Vector2> border = ImageDelaunay.GenerateBorderPoints(_amountBorderPoints, modTexture.width, modTexture.height);
+    /// <summary>
+    /// Calculate the triangulation for final mesh from entropy data
+    /// </summary>
+    void CalculateTriangulationFromEntropy(int width, int height)
+    {
+        //High detail points from entropy
+        List<Vector2> imageDetailPoints = ImageDelaunay.GenerateImageDetailPointsFromEntropy(width, height, _storedEntropy, _pointAmount, _influenceLength, _influenceStrength);
+        //Border around these ^ points
+        List<Vector2> border = ImageDelaunay.GenerateBorderPoints(_amountBorderPoints, width, height);
         imageDetailPoints.AddRange(border);
-        //imageDetailPoints = border;
 
-        Vector2 textureBounds = new Vector2(modTexture.width, modTexture.height);
-        List<Triangle> triangulation = DelaunayTriangulationGenerator.GenerateDelaunayTriangulationWithPoints(imageDetailPoints, textureBounds);
+        //Create triangulation from these points
+        Vector2 textureBounds = new Vector2(width, height);
+        _triangulation = DelaunayTriangulationGenerator.GenerateDelaunayTriangulationWithPoints(imageDetailPoints, textureBounds);
+    }
 
-        _displayDelaunayTriangulation.Display(triangulation, textureBounds);
-        _displayTexture.transform.position = new Vector3(textureBounds.x / 2, textureBounds.y / 2);
+    Texture2D CalculateFinalMeshTexture(Texture2D originalTexture, int width, int height)
+    {
+        Mesh mesh = MeshGenerator.GenerateMeshFromTriangulation(_triangulation, originalTexture, _gradientRadiusModifier);
+        _meshFilter.mesh = mesh;
 
-
-        Mesh mesh = MeshGenerator.GenerateMeshFromTriangulation(triangulation, originalTexture, _gradientRadiusModifier);
-        _displayMesh.DisplayMeshNow(mesh);
-
-        Texture2D meshTexture = _cameraScript.SetCameraToTexture(textureBounds.x, textureBounds.y);
-
-        return meshTexture;
+        return _cameraScript.GetCameraTextureOfMesh(width, height);
     }
 }
