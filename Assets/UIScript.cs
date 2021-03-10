@@ -25,9 +25,10 @@ public class UIScript : MonoBehaviour
 
     [SerializeField] Image _originalTextureImage;
     [SerializeField] Image _displayCurrentMeshImage;
-    [SerializeField] Text _filePathText;
+    [SerializeField] TMPro.TMP_Text _filePathText;
     [SerializeField] Controller _controllerScript;
     [SerializeField] GameObject _hideSettingsObject;
+    [SerializeField] GameObject _hideExportObject;
     [SerializeField] GameObject _fileExplorerPrefab;
     [SerializeField] Transform _fileExplorerHolder;
 
@@ -35,6 +36,7 @@ public class UIScript : MonoBehaviour
     FileExplorer.FileExplorer _currentFileExplorer;
 
     Texture2D _inputTexture;
+    Texture2D _generatedTexture;
 
     private void Awake()
     {
@@ -42,6 +44,11 @@ public class UIScript : MonoBehaviour
             _validImageTypeHashSet.Add(type);
     }
     
+    public Texture2D GetTexture()
+    {
+        return _generatedTexture;
+    }
+
     public void HardGenerate()
     {
         _controllerScript.NeedNewEntropy();
@@ -66,8 +73,8 @@ public class UIScript : MonoBehaviour
                                         _borderPointAmountSlider.value, _pointInfluenceLengthSlider.value,
                                         _pointInfluenceStrengthSlider.value, _cornerColorSamplePointSlider.value);
 
-        Texture2D meshTexture = _controllerScript.Generate(_inputTexture);
-        _displayCurrentMeshImage.sprite = SpriteFromTexture(meshTexture);
+        _generatedTexture = _controllerScript.Generate(_inputTexture);
+        _displayCurrentMeshImage.sprite = SpriteFromTexture(_generatedTexture);
     }
 
     /// <summary>
@@ -95,6 +102,7 @@ public class UIScript : MonoBehaviour
             LoadTexture(filePath);
             _filePathText.text = filePath;
             _hideSettingsObject.SetActive(false);
+            _hideExportObject.SetActive(false);
         }
     }
 
