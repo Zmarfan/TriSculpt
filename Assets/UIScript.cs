@@ -130,10 +130,14 @@ public class UIScript : MonoBehaviour
         return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
     }
 
+    /// <summary>
+    /// Resizes texture if it is to big as to cut down on calculation time. No loss in detail is lost for triangels
+    /// </summary>
     Texture2D ResizeTexture(Texture2D texture)
     {
         Texture2D modTexture = new Texture2D(texture.width, texture.height);
         modTexture.SetPixels(texture.GetPixels());
+        modTexture.name = texture.name;
         modTexture.Apply();
 
         if (NeedToResizeTexture(modTexture, out int newWidth, out int newHeight))

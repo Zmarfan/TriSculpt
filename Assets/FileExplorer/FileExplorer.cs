@@ -40,6 +40,7 @@ namespace FileExplorer
             { string.Empty, FileTypes.Directory },
             { ".txt", FileTypes.txt },
             { ".png", FileTypes.png },
+            { ".jpg", FileTypes.jpg },
         };
 
         string _filePath;
@@ -273,6 +274,7 @@ namespace FileExplorer
             Directory,
             txt,
             png,
+            jpg,
             Unknown
         }
 
