@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using System.Diagnostics;
 
-public class Controller : MonoBehaviour
+public class Algorithm : MonoBehaviour
 {
     static readonly int DETAIL_ACCURACY_MIN = 16;
 

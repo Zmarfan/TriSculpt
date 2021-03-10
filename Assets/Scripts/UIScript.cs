@@ -26,7 +26,7 @@ public class UIScript : MonoBehaviour
     [SerializeField] Image _originalTextureImage;
     [SerializeField] Image _displayCurrentMeshImage;
     [SerializeField] TMPro.TMP_Text _filePathText;
-    [SerializeField] Controller _controllerScript;
+    [SerializeField] Algorithm _algorithmScript;
     [SerializeField] GameObject _hideSettingsObject;
     [SerializeField] GameObject _hideExportObject;
     [SerializeField] GameObject _fileExplorerPrefab;
@@ -51,7 +51,7 @@ public class UIScript : MonoBehaviour
 
     public void HardGenerate()
     {
-        _controllerScript.NeedNewEntropy();
+        _algorithmScript.NeedNewEntropy();
         NormalGenerate();
     }
 
@@ -60,7 +60,7 @@ public class UIScript : MonoBehaviour
     /// </summary>
     public void NormalGenerate()
     {
-        _controllerScript.NeedNewPoints();
+        _algorithmScript.NeedNewPoints();
         Generate();
     }
 
@@ -69,11 +69,11 @@ public class UIScript : MonoBehaviour
     /// </summary>
     public void Generate()
     {
-        _controllerScript.SetParameters(_detailAccuracySlider.value, _amountOfPointsSlider.value,
+        _algorithmScript.SetParameters(_detailAccuracySlider.value, _amountOfPointsSlider.value,
                                         _borderPointAmountSlider.value, _pointInfluenceLengthSlider.value,
                                         _pointInfluenceStrengthSlider.value, _cornerColorSamplePointSlider.value);
 
-        _generatedTexture = _controllerScript.Generate(_inputTexture);
+        _generatedTexture = _algorithmScript.Generate(_inputTexture);
         _displayCurrentMeshImage.sprite = SpriteFromTexture(_generatedTexture);
     }
 
