@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using TMPro;
 
 namespace FileExplorer
 {
@@ -10,7 +11,7 @@ namespace FileExplorer
     {
         [SerializeField, Range(0.01f, 5f)] float _doubleClickWindow = 0.5f;
         [SerializeField] Color _notSupportedColor;
-        [SerializeField] Text _nameText;
+        [SerializeField] TMP_Text _nameText;
         [SerializeField] Image _spriteImage;
         [SerializeField] Image _buttonImage;
         [SerializeField] Button _button;

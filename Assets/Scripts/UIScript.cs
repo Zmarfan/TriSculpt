@@ -1,8 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using UnityEngine.UI;
+using TMPro;
 
 public class UIScript : MonoBehaviour
 {
@@ -25,7 +25,7 @@ public class UIScript : MonoBehaviour
 
     [SerializeField] Image _originalTextureImage;
     [SerializeField] Image _displayCurrentMeshImage;
-    [SerializeField] TMPro.TMP_Text _filePathText;
+    [SerializeField] TMP_Text _filePathText;
     [SerializeField] Algorithm _algorithmScript;
     [SerializeField] GameObject _hideSettingsObject;
     [SerializeField] GameObject _hideExportObject;

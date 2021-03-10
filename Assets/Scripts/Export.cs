@@ -1,19 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.IO;
+using TMPro;
 
 public class Export : MonoBehaviour
 {
     [SerializeField] string _exportStartString = "This triangulation image will be exported as ";
     [SerializeField] string _exportMiddleString = ".png to ";
     [SerializeField] Environment.SpecialFolder _startFolder;
-    [SerializeField] Text _filepathText;
+    [SerializeField] TMP_Text _filepathText;
 
     [SerializeField] UIScript _uiScript;
-    [SerializeField] Text _savePromptText;
+    [SerializeField] TMP_Text _savePromptText;
     [SerializeField] GameObject _savePrompt;
     [SerializeField] GameObject _fileExplorerPrefab;
     [SerializeField] Transform _fileExplorerHolder;

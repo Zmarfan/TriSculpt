@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class SliderScript : MonoBehaviour
 {
     [SerializeField] Slider _thisSlider;
-    [SerializeField] Text _sliderValueText;
+    [SerializeField] TMP_Text _sliderValueText;
 
     private void Awake()
     {

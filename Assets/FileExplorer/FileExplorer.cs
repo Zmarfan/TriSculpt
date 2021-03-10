@@ -4,6 +4,7 @@ using System;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Text;
+using TMPro;
 
 namespace FileExplorer
 {
@@ -21,9 +22,9 @@ namespace FileExplorer
         [Header("Drop")]
 
         [SerializeField] Button _selectButton;
-        [SerializeField] Text _fileNameText;
-        [SerializeField] Text _fileTypeText;
-        [SerializeField] InputField _inputfield;
+        [SerializeField] TMP_Text _fileNameText;
+        [SerializeField] TMP_Text _fileTypeText;
+        [SerializeField] TMP_InputField _inputfield;
         [SerializeField] Transform _iconArea;
         [SerializeField] GameObject _iconPrefab;
         [SerializeField] FileTypeToSprite[] _fileTypeToSpriteList;
@@ -255,7 +256,7 @@ namespace FileExplorer
 
             switch ((StartDirectories)startDirectoryIndex)
             {
-                case StartDirectories.dekstop:    specialFolder = Environment.SpecialFolder.DesktopDirectory; break;
+                case StartDirectories.desktop:    specialFolder = Environment.SpecialFolder.DesktopDirectory; break;
                 case StartDirectories.documents:  specialFolder = Environment.SpecialFolder.MyDocuments; break;
                 case StartDirectories.favorites: specialFolder = Environment.SpecialFolder.ProgramFiles; break;
                 default: specialFolder = Environment.SpecialFolder.MyDocuments; break;
@@ -284,7 +285,7 @@ namespace FileExplorer
         [Serializable]
         public enum StartDirectories
         {
-            dekstop,
+            desktop,
             documents,
             favorites,
         }
