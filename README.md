@@ -19,6 +19,7 @@ Run the TriSculpt.exe within the folder to run the program. Since the program ex
 ![pic-1](https://github.com/Zmarfan/TriSculpt/blob/main/readmePictures/1.jpg?raw=true)
 ![pic-2](https://github.com/Zmarfan/TriSculpt/blob/main/readmePictures/2.jpg?raw=true)
 ![pic-3](https://github.com/Zmarfan/TriSculpt/blob/main/readmePictures/3.jpg?raw=true)
+![pic-4](https://github.com/Zmarfan/TriSculpt/blob/main/readmePictures/4.jpg?raw=true)
 
 ## Parameters
 * **Detail Accuracy** - How accurately the tool identifies points of interest. A low value will find high detail but compression might fool it. Too high values and the tool will have trouble spotting any detail. Recommendation is to keep it high.
