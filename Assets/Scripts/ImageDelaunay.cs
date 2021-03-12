@@ -128,7 +128,7 @@ public class ImageDelaunay
                 float old = entropyTable[thisX + x + (thisY + y) * width];
 
                 float affectValue = (Mathf.Abs(x) + Mathf.Abs(y)) / (float)(influenceLength * 2);
-                entropyTable[thisX + x + (thisY + y) * width] *= Mathf.Clamp(affectValue * (1 / influenceStrength), 0, old);
+                entropyTable[thisX + x + (thisY + y) * width] *= Mathf.Clamp(affectValue * (1 / Mathf.Max(influenceStrength, 0.0001f)), 0, old);
             }
         }
     }
