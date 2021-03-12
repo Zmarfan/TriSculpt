@@ -10,7 +10,7 @@ Run the TriSculpt.exe within the folder to run the program. Since the program ex
 
 ## How to use
 1. Press **Load Image** and select image to work on. 
-1. Manipulate parameters for desired triangulation. Check **Parameters for more info**
+1. Manipulate parameters for desired triangulation. Check *Parameters* for more info
 1. Choose export folder by pressing **Export Folder** or leave at default which is *Desktop*
 1. Export Image by pressing **Export Image**
 
