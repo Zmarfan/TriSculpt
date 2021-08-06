@@ -1,12 +1,12 @@
 # TriSculpt
 
- A tool made to automatically triangulate pictures and then export them. The process uses Delaunay Triangulation and Shannon Entropy to detect points of interest in an image and then create a triangulation mesh from them. .png and .jpg are supported and the original image file will not be changed. The export image will be a png file. The program is developed using Unity. 
+A tool made to automatically triangulate pictures and then export them. The process uses Delaunay Triangulation and Shannon Entropy to detect points of interest in an image and then create a triangulation mesh from them. .png and .jpg are supported and the original image file will not be changed. The export image will be a png file. The program is developed using Unity. 
 
 ---
 
 ## Installation
 
-Run the TriSculpt.exe within the folder to run the program. Since the program export images antiviruses might interfer. If you are unable to export or run the program properly try whitelisting triSculpt.exe.
+[Download](https://drive.google.com/drive/folders/15Caaugp3H4eM1VS8gGigU5vRhe8rtcdg) and run the TriSculpt.exe within the folder to start the program. Since the program export images antiviruses might interfer. If you are unable to export or run the program properly try whitelisting triSculpt.exe.
 
 ## How to use
 1. Press **Load Image** and select image to work on. 
